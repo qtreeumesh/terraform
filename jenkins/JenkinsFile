@@ -1,0 +1,40 @@
+pipeline{
+        agent {label: "aws"}
+    parameters {
+
+                string(name: 'git_url', defaultValue: '', description: 'git url')
+                string(name: 'git_branch', defaultValue: '', description: 'git_branch')
+                choice(name: 'resoure',
+                         choices: ['','iam','s3', 'vpc','ec2', 'rds'],
+                                description: 'Apply will deploy a VPC, s3, rds..')
+                string(name: 'resource_name', defaultValue: '', description: 'folder name')
+                choice(name: 'build_option',
+                         choices: ['','plan','apply', 'destroy'],
+                                description: 'Apply will deploy a VPC, and Destroy will remove the VPC..')
+                }
+     stages{
+         stage('Git Checkout'){
+          steps{
+                    sh """      
+                    cd "/home/jenkins/git/"
+                    rm -rf *
+                    echo "Git initilization started"
+                    git init 
+                    echo "Git initilization completed"
+                    git branch -r
+                    git checkout ${git_branch}
+                    git clone ${git_url}
+                    echo "Git pull completed"
+                    """
+            }
+         }
+          stage('Terraform init '){
+          steps{
+                    sh """
+                        terraform -chdir="/home/jenkins/git/automation/${resoure}/${folder_name}/" init 
+                        terraform -chdir="/home/jenkins/git/automation/${resoure}/${folder_name}/" ${build_option} --auto-approve 
+                        """
+            }
+         }
+     }
+}
