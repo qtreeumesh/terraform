@@ -13,11 +13,8 @@ resource "aws_s3_bucket" "bucket" {
  versioning {
     enabled = true
   }
-  logging {
-    target_bucket = "umeshcovaibukcet"
-    target_prefix = "log/"
  }
  tags = {
-  Name = "bucket"
+  Name = "demo-bucket"
  }
 }
